@@ -1,14 +1,17 @@
 ##Twitter API/twitteR Test
 #Donovan Eyre
 
-#install and load relevant packages
+# Install relevant packages
 install.packages("twitteR")
-library(twitteR)
-#NOTE ROAuth phased out and replaced with httr, apparently
-#install.packages("ROAuth")
-#library(ROAuth)
 install.packages("httr")
+install.packages("wordcloud")
+install.packages("tm")
+
+# Load 'em
 library(httr)
+library(twitteR)
+library(wordcloud)
+library(tm)
 
 #Setting up oauth
 
@@ -27,8 +30,10 @@ userTimeline("POTUS", 10)
 # Tweet source chart from tutorial - adapted for user instead of trend
 library(ggplot2)
 # Get David's timeline (API can pull from max last two weeks I think)
-momtweets <- userTimeline('realDonaldTrump', n = 100)
-sources <- sapply(momtweets, function(x) x$getStatusSource())
+# We will need to set up some kind of recurring pull in the future to keep
+# Clients' info updated
+charkTweets <- userTimeline('Charlotte_A9', n = 100)
+sources <- sapply(charkTweets, function(x) x$getStatusSource())
 sources <- gsub("</a>", "", sources)
 sources <- strsplit(sources, ">")
 sources <- sapply(sources, function(x) ifelse(length(x) > 1, x[2], x[1]))
@@ -42,3 +47,36 @@ ggplot(source_df, aes(sources)) + geom_bar() + coord_flip()
 # Apparently David only tweets from iPhone
 
 
+# Searching for hashtag mentions in Nashville
+
+# Use the searchTwitter funtion to find a word in five miles of the lat/long of Nash
+
+nashSearch <- function(term) { 
+        searchTwitter(term, 
+              # NOTE no spaces in geocode arg
+              geocode = "36.1627,-86.7816,5mi",
+              n = 500, 
+              retryOnRateLimit = 1)
+}
+
+# Make a wordcloud from a user's recent tweets
+
+# Pull recent tweets (may not actually be 100 due to API limitation)
+charkTweets <- userTimeline('Charlotte_A9', n = 100)
+
+# Separate text and save it
+charkText <- sapply(charkTweets, function(x) x$getText())
+
+# Create corpus (what is this exactly? look into it)
+charkText_corpus <- Corpus(VectorSource(charkText))
+
+# Cleanup text (remove stopwords, capitalizations, punctuation)
+charkText_corpus <- tm_map(charkText_corpus,
+                   content_transformer(function(x) iconv(x, to='UTF-8-MAC', sub='byte')),
+                   mc.cores=1)
+charkText_corpus <- tm_map(charkText_corpus, content_transformer(tolower), mc.cores=1)
+charkText_corpus <- tm_map(charkText_corpus, removePunctuation, mc.cores=1)
+charkText_corpus <- tm_map(charkText_corpus, function(x)removeWords(x,stopwords()), mc.cores=1)
+
+#Generate that wordcloud!
+wordcloud(charkText_corpus, min.freq = 4)
