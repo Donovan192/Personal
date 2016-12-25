@@ -32,7 +32,7 @@ library(ggplot2)
 # Get David's timeline (API can pull from max last two weeks I think)
 # We will need to set up some kind of recurring pull in the future to keep
 # Clients' info updated
-charkTweets <- userTimeline('Charlotte_A9', n = 100)
+charkTweets <- userTimeline('howdeyreyou', n = 100)
 sources <- sapply(charkTweets, function(x) x$getStatusSource())
 sources <- gsub("</a>", "", sources)
 sources <- strsplit(sources, ">")
@@ -62,7 +62,7 @@ nashSearch <- function(term) {
 # Make a wordcloud from a user's recent tweets
 
 # Pull recent tweets (may not actually be 100 due to API limitation)
-charkTweets <- userTimeline('Charlotte_A9', n = 100)
+charkTweets <- userTimeline('howdeyreyou', n = 100)
 
 # Separate text and save it
 charkText <- sapply(charkTweets, function(x) x$getText())
@@ -79,4 +79,4 @@ charkText_corpus <- tm_map(charkText_corpus, removePunctuation, mc.cores=1)
 charkText_corpus <- tm_map(charkText_corpus, function(x)removeWords(x,stopwords()), mc.cores=1)
 
 #Generate that wordcloud!
-wordcloud(charkText_corpus, min.freq = 4)
+wordcloud(charkText_corpus, min.freq = 100, max.words = 200)
