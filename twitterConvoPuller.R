@@ -8,6 +8,7 @@
 #install.packages("tm")
 install.packages("SocialMediaLab")
 install.packages("igraph")
+install.packages("gender")
 
 # Load 'em
 #library(httr)
@@ -15,9 +16,10 @@ install.packages("igraph")
 #library(tm)
 library(SocialMediaLab)
 library(igraph)
+library(gender)
 
 
-# Setting up authentication
+# Set up authentication
 
 # Enter app keys and tokens
 myKey <- "dxW6K6MDLt8krA1GBrsYaGfIW"
@@ -27,13 +29,14 @@ myTokenSecret <- "6nfvDsfdPikeETOKjyGxw28jvX9Hn9xi3lSd7qOI5wDg3"
 
 myCred <- Authenticate("twitter", apiKey = myKey, apiSecret = mySecret, accessToken = myToken, accessTokenSecret = myTokenSecret)
 
-# Collecting data
+# Collect data
 
 tweets <- Collect(myCred, searchTerm = "#BasketballWives", numTweets = 500, language = "en")
 
-# Removing non-supported characters
+# Remove non-supported characters
 
+# Predict gender NOTE we're only getting handle for some reason, not user's name which would make prediction much easier...
 
-# Creating bimodal network
-
-network <- Create(dataSource = tweets, type = "bimodal")
+# Create bimodal network
+# ONLY NEED TO DO THIS IF HAVE EXTRA TIME/WANT TO
+# network <- Create(dataSource = tweets, type = "bimodal")

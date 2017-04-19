@@ -22,7 +22,7 @@ accessToken <- "802282794026201092-iFNeByUoum2NfBNjgbwe7M92l4k85V1"
 accessTokenSecret <- "6nfvDsfdPikeETOKjyGxw28jvX9Hn9xi3lSd7qOI5wDg3"
 
 #intiate oauth
-setup_twitter_oauth(consumerKey, consumerSecret, accessToken, accessTokenSecret)
+cred <- setup_twitter_oauth(consumerKey, consumerSecret, accessToken, accessTokenSecret)
 
 #Test pulling latest 10 tweet from Obama (@POTUS)
 userTimeline("POTUS", 10)
@@ -32,7 +32,7 @@ library(ggplot2)
 # Get David's timeline (API can pull from max last two weeks I think)
 # We will need to set up some kind of recurring pull in the future to keep
 # Clients' info updated
-charkTweets <- userTimeline('howdeyreyou', n = 100)
+testTweets <- userTimeline('howdeyreyou', n = 100)
 sources <- sapply(charkTweets, function(x) x$getStatusSource())
 sources <- gsub("</a>", "", sources)
 sources <- strsplit(sources, ">")
