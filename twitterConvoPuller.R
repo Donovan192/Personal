@@ -3,23 +3,23 @@
 ## 2017-04-17
 
 # Install relevant packages
-#install.packages("twitteR")
-#install.packages("httr")
-#install.packages("tm")
-install.packages("SocialMediaLab")
-install.packages("igraph")
+install.packages("twitteR")
+install.packages("httr")
+install.packages("devtools")
+install.packages("rjson")
+install.packages("bit64")
 install.packages("gender")
 
 # Load 'em
-#library(httr)
-#library(twitteR)
-#library(tm)
-library(SocialMediaLab)
-library(igraph)
+library(twitteR)
+library(httr)
+library(devtools)
+library(rjson)
+library(bit64)
 library(gender)
+library(plyr)
 
-
-# Set up authentication
+### Set up authentication
 
 # Enter app keys and tokens
 myKey <- "dxW6K6MDLt8krA1GBrsYaGfIW"
@@ -27,16 +27,48 @@ mySecret <- "slIDtlo5M4skRduKRnrQqIvsxiQxkihziqSvNbAm3QGhCeVPL3"
 myToken <- "802282794026201092-iFNeByUoum2NfBNjgbwe7M92l4k85V1"
 myTokenSecret <- "6nfvDsfdPikeETOKjyGxw28jvX9Hn9xi3lSd7qOI5wDg3"
 
-myCred <- Authenticate("twitter", apiKey = myKey, apiSecret = mySecret, accessToken = myToken, accessTokenSecret = myTokenSecret)
+setup_twitter_oauth(myKey, mySecret, myToken, myTokenSecret)
 
-# Collect data
+### Collect data
 
-tweets <- Collect(myCred, searchTerm = "#BasketballWives", numTweets = 500, language = "en")
+blackhawks <- searchTwitter("Blackhawks", 1000, "en", "2017-04-20", "2017-04-30")
 
-# Remove non-supported characters
+blackhawks <- twListToDF(blackhawks) # Change output list to data.frame
 
-# Predict gender NOTE we're only getting handle for some reason, not user's name which would make prediction much easier...
+# Remove non-alphanumeric characters (except "@")
+blackhawks$text <- gsub("[^[:alnum:@]///' ]", "", blackhawks$text)
 
-# Create bimodal network
-# ONLY NEED TO DO THIS IF HAVE EXTRA TIME/WANT TO
-# network <- Create(dataSource = tweets, type = "bimodal")
+# Subset based on SN that was replied to most (need to add code to find this automatically)
+bhsub <- subset(blackhawks, blackhawks$replyToSN == "CMPunk")
+
+
+### Get corresponding names for @usernames in the DF using usersearch then add them to DF as new col
+
+# Get list of @usernames
+screenNames <- unique((blackhawks$screenName))
+
+# Lookup all usernames and pull user object for each (includes name)
+users <- lookupUsers(screenNames)
+
+# Change users object to df
+users <- twListToDF(users)
+
+# Remove everything but screenName and name columns
+users <- data.frame(users$screenName, users$name)
+names(users) <- c("screenName", "name") # Rename columns to remove "user."
+
+# Insert names as a new column in blackhawks NOT WORKING, RETURNING LESS ROWS THAN BLACKHAWKS DF
+blackhawks <- merge(blackhawks, users, by = "screenName")
+
+# Pull only first word before whitespace from username
+sub(" .*", "", blackhawks$name)
+
+# Predict gender
+
+### SCRATCH
+
+# Check any limits that have been affected
+#subset(x, as.numeric(x$limit) - as.numeric(x$remaining) != 0)
+
+
+
