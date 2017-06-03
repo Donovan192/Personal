@@ -30,7 +30,7 @@ create_token(app = "DonovanR", consumer_key = myKey, consumer_secret = mySecret,
 
 ### Collect data
 
-tweets <- search_tweets("nfldraft", n = 100, parse = T, lang = "en",  tweet_mode = "extended")
+tweets <- search_tweets("nfldraft", n = 1000, parse = T, lang = "en", include_rts = FALSE,  tweet_mode = "extended")
 
 # Remove non-alphanumeric characters from tweet text (except "@")
 tweets$text <- gsub("[^[:alnum:@]///' ]", "", tweets$text)
@@ -58,7 +58,9 @@ tweets <- merge(tweets, users, by = "screen_name", all.x = TRUE)
 
 # Pulling out tweets that are responses or have been responded-to (within the data we have)
 convos <- subset(tweets, is.na(tweets$in_reply_to_status_screen_name) == FALSE 
-                 | tweets$screen_name %in% tweets$in_reply_to_status_status_id == TRUE)
+                 | tweets$screen_name %in% tweets$in_reply_to_status_status_id == TRUE
+                 | is.na(tweets$mentions_screen_name) == FALSE
+                 | tweets$screen_name %in% tweets$mentions_screen_name == TRUE)
 
 # Predict gender using genderize
 
@@ -109,11 +111,3 @@ convosFinal <- arrange(convosSubset, created_at)
 # Check any limits that have been affected
 #x <- getCurRateLimitInfo()
 # subset(x, as.numeric(x$limit) - as.numeric(x$remaining) != 0)
-
-
-# Predict gender and convert output to df
-#nameGenders <- gender(tweets$name, years = c(1950, 2005))
-#nameGenders <- as.data.frame(nameGenders)
-
-# Subset based on SN that was replied to most (need to add code to find this automatically)
-#bhsub <- subset(tweets, tweets$replyToSN == "CMPunk")
