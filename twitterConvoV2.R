@@ -30,7 +30,7 @@ create_token(app = "DonovanR", consumer_key = myKey, consumer_secret = mySecret,
 
 ### Collect data
 
-tweets <- search_tweets("nfldraft", n = 1000, parse = T, lang = "en", include_rts = FALSE,  tweet_mode = "extended")
+tweets <- search_tweets("nbadraft", n = 10000, parse = T, lang = "en", include_rts = FALSE,  tweet_mode = "extended")
 
 # Remove non-alphanumeric characters from tweet text (except "@")
 tweets$text <- gsub("[^[:alnum:@]///' ]", "", tweets$text)
@@ -50,7 +50,7 @@ names(users) <- c("screen_name", "name") # Rename columns to remove "user."
 # Insert names as a new column in tweets NOT WORKING, RETURNING LESS ROWS THAN tweets DF
 tweets <- merge(tweets, users, by = "screen_name", all.x = TRUE)
 
-# Remove non-alphanumeric characters
+# Remove nonalpha characters
 #tweets$name <- gsub("[^[:alnum:]///' ]", "", tweets$name)
 
 # Remove unwanted columns THIS MAY NOT BE WORKING

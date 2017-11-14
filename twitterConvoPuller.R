@@ -31,9 +31,8 @@ setup_twitter_oauth(myKey, mySecret, myToken, myTokenSecret)
 
 ### Collect data
 
-tweets <- searchTwitter("nfldraft", 
-                            n = 100000, 
-                            lang = "en")
+tweets <- searchTwitter("nfldraft", n = 10, lang = "en", tweet_mode='extended')
+                        
 
 tweets <- twListToDF(tweets) # Change output list to data.frame
 
